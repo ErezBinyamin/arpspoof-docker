@@ -32,16 +32,17 @@ if __name__ == '__main__':
     URL="http://{LHOST}:{LPORT}/{action}?ip={RHOST}".format(LHOST=LHOST, LPORT=LPORT, action=action, RHOST=args.rhost)
     req = requests.get(url=URL)
 
-    if args.status and req.text == '0':
-        logger.info("{RHOST} not being spoofed".format(RHOST=args.rhost))
-    elif args.status and req.text == '1':
-        logger.info("{RHOST} is being spoofed".format(RHOST=args.rhost))
-    else:
-        logger.error("api-response: {response}".format(response=req.text))
-
-    if args.stop:
+    # Status/Start log messages
+    if args.status or args.start:
+        if req.text == '0':
+            logger.info("Status: {RHOST} not being spoofed".format(RHOST=args.rhost))
+        elif req.text == '1':
+            logger.info("Status: {RHOST} is being spoofed".format(RHOST=args.rhost))
+    # Stop command log messages
+    elif args.stop:
         URL="http://{LHOST}:{LPORT}/{action}?ip={RHOST}".format(LHOST=LHOST, LPORT=LPORT, action='status', RHOST=args.rhost)
         logger.info("Stopping spoofing on {RHOST}...".format(RHOST=args.rhost))
         while requests.get(url=URL).text == '1':
             time.sleep(1)
-        logger.info("{RHOST} not being spoofed".format(RHOST=args.rhost))
+        logger.info("Spoofing stopped on {RHOST}".format(RHOST=args.rhost))
+        
